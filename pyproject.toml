@@ -5,7 +5,7 @@ description = "Pulls data from BOM website according to schedule"
 authors = ["Timothy Holmes <tim.a.holmes@gmail.com>"]
 packages = [
     {include = "bom_bot", from = "src"},
-    {inlcude = "logging", from = "src"}
+    {include = "logging", from = "src"}
 ]
 
 [tool.poetry.dependencies]

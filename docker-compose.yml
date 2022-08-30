@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+  bom-bot:
+    build: .
+    volumes:
+      - type: bind
+        source: ./data
+        target: /bom-bot/data
+      - type: bind
+        source: ./config
+        target: /bom-bot/config
+      - type: bind
+        source: ./logs
+        target: /bom-bot/logs

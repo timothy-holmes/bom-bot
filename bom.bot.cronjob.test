@@ -1,0 +1,2 @@
+# runs bom-bot everyday at 07:29, pings healthchecks.io with start and finish
+* * * * * python /bom-bot/cron_test.py

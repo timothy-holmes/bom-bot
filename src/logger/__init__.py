@@ -1,5 +1,5 @@
+import json
 import logging.config
-from .logger_config import config
 
 """
 Setup:
@@ -21,7 +21,8 @@ Usage:
 
 """
 
-logging.config.dictConfig(config)
+with open("./config/logging.json", "r") as config_json:
+    logging.config.dictConfig(json.load(config_json))
 
 
 def build_logger(name: str):
