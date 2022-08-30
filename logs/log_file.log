@@ -1,0 +1,11 @@
+503 | INFO | __init__.py:80 | action_stations | {num}: Extracted station data: {"station_name": "Laverton-RAAF Williams", "last_date_time": "20220830203000"}
+504 | DEBUG | bom_bot.py:20 | main | Actioned stations (fuck you)
+126 | DEBUG | bom_bot.py:8 | main | Created logger
+126 | DEBUG | bom_bot.py:12 | main | Loaded config file
+127 | DEBUG | bom_bot.py:16 | main | Loaded stations file
+127 | INFO | __init__.py:22 | __init__ | Loaded `stations` and `config`
+127 | DEBUG | __init__.py:25 | __init__ | Set request headers: User-Agent
+127 | INFO | __init__.py:29 | __init__ | BomScraper instance: ready
+336 | DEBUG | __init__.py:45 | action_stations | Requested http://www.bom.gov.au/fwo/IDV60801/IDV60801.94865.json, got r.status_code=200
+385 | INFO | __init__.py:80 | action_stations | 0: Extracted station data: {"station_name": "Laverton-RAAF Williams", "last_date_time": "20220830203000"}
+386 | DEBUG | bom_bot.py:20 | main | Actioned stations (fuck you)

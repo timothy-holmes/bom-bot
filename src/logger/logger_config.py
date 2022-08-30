@@ -1,4 +1,3 @@
-# config.py
 def load_config():
     return {
         "version": 1,
@@ -26,7 +25,7 @@ def load_config():
                 "class": "logging.handlers.RotatingFileHandler",
                 "formatter": "precise",
                 "level": "DEBUG",
-                "filename": "/logs/log_file.log",
+                "filename": "./logs/log_file.log",
                 "maxBytes": 1024,
                 "backupCount": 5,
             },

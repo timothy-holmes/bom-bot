@@ -1,5 +1,5 @@
 import logging.config
-from logger_config import config
+from .logger_config import config
 
 """
 Setup:

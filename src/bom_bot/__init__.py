@@ -24,7 +24,7 @@ class BomScraper:
         self.req.headers.update(config.get("req_headers", None))
         logger.debug(
             "Set request headers: "
-            + ",".join(k for k, v in config.get("req_headers", None))
+            + ",".join(k for k, v in config.get("req_headers", {}).items())
         )
         logger.info("BomScraper instance: ready")
 
@@ -43,17 +43,31 @@ class BomScraper:
                 r = self.req.get(s_url)
                 assert r.status_code == 200
                 logger.debug(f"Requested {s_url}, got {r.status_code=}")
-            except Exception as e:
-                logger.error(f"{num}: HTTP error: {r.status_code=}, {r.content=}")
+            except Exception as e1:
+                try:
+                    logger.error(
+                        f"{num}: HTTPError/{e1}: {r.status_code=}, {r.content=}"
+                    )
+                except Exception as e2:
+                    logger.error(f"{num}: ConnectionError/{e1}, {e2}: {s_url=}")
                 continue
 
             try:
                 s_json = r.json()
                 assert s_id == (
-                    s_json.get("observations", {}).get("headers", [""])[0].get("ID", {})
+                    json_id := s_json.get("observations", {})
+                    .get("header", [""])[0]
+                    .get("ID", {})
                 )
-            except Exception as e:
-                logger.error(f"{num}: JSON/data error: {r.status_code=}, {r.content=}")
+            except Exception as e1:
+                try:
+                    logger.error(
+                        f"{num}: JSON/data error/{e1}: {r.status_code=}, {s_id}=={json_id} {r.content[:500]=}"
+                    )
+                except Exception as e2:
+                    logger.error(
+                        f"{num}: JSON/data error/{e1}, {e2}: {r.status_code=}, {r.content[:500]=}"
+                    )
                 continue
 
             last_date_time = (
@@ -71,6 +85,6 @@ class BomScraper:
 
             result = {"station_name": s_name, "last_date_time": last_date_time}
             results["stations"].append(result)
-            logger.info("{num}: Extracted station data: " + json.dumps(result))
+            logger.info(f"{num}: Extracted station data: " + json.dumps(result))
 
         # return results
