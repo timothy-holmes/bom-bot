@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "BOM-scraper"
+version = "0.1.0"
+description = "Pulls data from BOM website according to schedule"
+authors = ["Timothy Holmes <tim.a.holmes@gmail.com>"]
+packages = [
+    {include = "bom_scraper", from = "src"}
+]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+requests = "^2.28.1"
+
+[tool.poetry.dev-dependencies]
+diagrams = "^0.21.1"
+pytest = "^7.1.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
