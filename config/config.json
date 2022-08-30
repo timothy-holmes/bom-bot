@@ -1,3 +1,6 @@
 {
-    "save_path": "/data/bs_data/{station}/{date_time}.json"
+    "save_path": "/data/bs_data/{station_name}-{last_date_time}.json",
+    "req_header": {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36"
+    }
 }
