@@ -1,10 +1,10 @@
 [tool.poetry]
-name = "BOM-scraper"
+name = "BOM-bot"
 version = "0.1.0"
 description = "Pulls data from BOM website according to schedule"
 authors = ["Timothy Holmes <tim.a.holmes@gmail.com>"]
 packages = [
-    {include = "bom_scraper", from = "src"}
+    {include = "bom_bot", from = "src"}
 ]
 
 [tool.poetry.dependencies]
