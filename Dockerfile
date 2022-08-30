@@ -11,11 +11,13 @@ RUN pip install -r requirements.txt
 COPY bom_bot.py bom_bot.py
 COPY src src/
 
-# testing cron
+# Testing cron
 COPY bom.bot.cronjob.test /etc/cron.d/
 COPY cron_test.py cron_test.py
 
-# production cron
+# Production cron
 COPY bom.bot.cronjob /etc/cron.d/
 
-ENTRYPOINT ["bash"]
+# Setup container to run continuously
+RUN touch /var/log/cron.log
+CMD cron && tail -f /var/log/cron.log
