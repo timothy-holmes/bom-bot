@@ -1,4 +1,4 @@
-from python:latest
+FROM python:latest
 
 RUN apt-get update
 RUN apt-get -y install cron
@@ -15,7 +15,7 @@ COPY bom_bot.py bom_bot.py
 COPY src src/
 
 # Testing cron
-COPY bom.bot.cronjob.test /etc/cron.d/
+COPY bom.bot.cronjob*.test /etc/cron.d/
 COPY cron_test.py cron_test.py
 
 # Production cron
