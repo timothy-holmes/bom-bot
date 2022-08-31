@@ -1,5 +1,8 @@
 from python:latest
 
+RUN apt-get update
+RUN apt-get -y install cron
+
 ENV INSTALL_PATH /bom-bot
 RUN mkdir -p $INSTALL_PATH
 
