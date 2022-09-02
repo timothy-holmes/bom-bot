@@ -1,6 +1,13 @@
 version: "3.8"
 
 services:
+  ofelia:
+    image: mcuadros/ofelia:latest
+    depends_on:
+      - bot
+    command: daemon --docker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
   bom-bot:
     build: .
     volumes:
@@ -13,3 +20,7 @@ services:
       - type: bind
         source: ./logs
         target: /bom-bot/logs
+    labels:
+      ofelia.enabled: "true"
+      ofelia.job-exec.datecron.schedule: "@daily"
+      ofelia.job-exec.datecron.command: "curl http://192.168.1.103:8000/ping/9ca9609e-474c-4b02-a24c-e3e1ba88ee35/start && python /bom-bot/bom-bot.py && curl http://192.168.1.103:8000/ping/9ca9609e-474c-4b02-a24c-e3e1ba88ee35"
