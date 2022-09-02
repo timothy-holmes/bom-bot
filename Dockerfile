@@ -16,4 +16,4 @@ COPY src src/
 
 # CMD curl http://192.168.1.103:8000/ping/9ca9609e-474c-4b02-a24c-e3e1ba88ee35/start && python /bom-bot/bom-bot.py && curl http://192.168.1.103:8000/ping/9ca9609e-474c-4b02-a24c-e3e1ba88ee35
 
-CMD python --version
+CMD tail -f
