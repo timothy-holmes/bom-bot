@@ -14,13 +14,6 @@ RUN pip install -r requirements.txt
 COPY bom_bot.py bom_bot.py
 COPY src src/
 
-# Testing cron
-COPY bom.bot.cronjob*.test /etc/cron.d/
-COPY cron_test.py cron_test.py
+# CMD curl http://192.168.1.103:8000/ping/9ca9609e-474c-4b02-a24c-e3e1ba88ee35/start && python /bom-bot/bom-bot.py && curl http://192.168.1.103:8000/ping/9ca9609e-474c-4b02-a24c-e3e1ba88ee35
 
-# Production cron
-COPY bom.bot.cronjob /etc/cron.d/
-
-# Setup container to run continuously
-RUN touch /var/log/cron.log
-CMD cron && tail -f /var/log/cron.log
+CMD python --version
