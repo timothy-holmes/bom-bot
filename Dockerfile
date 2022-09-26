@@ -15,3 +15,5 @@ RUN chmod -R +x scripts
 
 # start up run
 RUN ./scripts/run.sh
+
+CMD tail -d

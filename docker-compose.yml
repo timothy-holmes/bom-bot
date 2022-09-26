@@ -10,6 +10,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
   bot:
     build: .
+    command: ['tail', '-f', '/dev/null']
     volumes:
       - type: bind
         source: ./data
@@ -22,5 +23,5 @@ services:
         target: /bom-bot/logs
     labels:
       ofelia.enabled: "true"
-      ofelia.job-exec.datecron.schedule: "@daily"
-      ofelia.job-exec.datecron.command: "curl http://health.hh.home/ping/9ca9609e-474c-4b02-a24c-e3e1ba88ee35/start && python /bom-bot/bom-bot.py && curl http://health.hh.home/ping/9ca9609e-474c-4b02-a24c-e3e1ba88ee35"
+      ofelia.job-exec.datecron.schedule: "5 6 * * *"
+      ofelia.job-exec.datecron.command: "/bin/sh /bom-bot/scripts/run.sh"
