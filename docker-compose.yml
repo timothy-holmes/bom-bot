@@ -2,6 +2,7 @@ version: "3.8"
 
 services:
   ofelia:
+    container_name: bom-bot-ofelia
     image: mcuadros/ofelia:latest
     depends_on:
       - bot
@@ -10,6 +11,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
   bot:
     build: .
+    container_name: bom-bot-script
     command: ['tail', '-f', '/dev/null']
     volumes:
       - type: bind
@@ -23,5 +25,5 @@ services:
         target: /bom-bot/logs
     labels:
       ofelia.enabled: "true"
-      ofelia.job-exec.datecron.schedule: "5 6 * * *"
+      ofelia.job-exec.datecron.schedule: "0 5 6 * * *"
       ofelia.job-exec.datecron.command: "/bin/sh /bom-bot/scripts/run.sh"
