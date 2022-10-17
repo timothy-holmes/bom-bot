@@ -4,7 +4,7 @@ from typing import Any
 import requests
 
 from src.logger import log
-from models import IotRecord, parse_bom_dt
+from .models import IotRecord, parse_bom_dt
 
 
 class BomETL:
