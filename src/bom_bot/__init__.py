@@ -3,24 +3,23 @@ from typing import Any
 
 import requests
 
-from src.logger import build_logger
+from src.logger import log
 from models import IotRecord, parse_bom_dt
 
-logger = build_logger(".".join(["bom-bot", __name__]))
 
 class BomETL:
     def __init__(self, config: dict[str, str | str], stations: list[dict[str, str]]):
         # {"station_name": "TestStation", "station_url": "http://test"}
         self.stations = stations
         self.config = config
-        logger.info("Loaded `stations` and `config`")
+        log.info("Loaded `stations` and `config`")
         self.req = requests.Session()
         self.req.headers.update(config.get("req_headers"))
-        logger.debug(
+        log.debug(
             "Set request headers: "
             + ",".join(k for k in config.get("req_headers",{}))
         )
-        logger.info("BomScraper instance: ready")
+        log.info("BomScraper instance: ready")
 
 
     def action_stations(self):  # I hate myself
@@ -31,7 +30,7 @@ class BomETL:
 
             # extract
             result, data = self._extract(num, s_id, s_name, s_url)
-            logger.info(f"{num}: Extracted station data: " + json.dumps(result))
+            log.info(f"{num}: Extracted station data: " + json.dumps(result))
 
             # transform
             records = self._transform(data)
@@ -42,15 +41,15 @@ class BomETL:
     def _extract(self, num: int, s_id: str, s_name: str, s_url: str) -> tuple[dict[str ,str], list[dict[str, Any]]]:
         try:
             r = self.req.get(s_url)
-            logger.debug(f"Requested {s_url}, got {r.status_code=}")
+            log.debug(f"Requested {s_url}, got {r.status_code=}")
             assert r.status_code == 200
         except Exception as e1:
             try:
                 e = f"{num}: HTTPError/{e1}: {r.status_code=}, {r.content=}"
-                logger.error(e)
+                log.error(e)
             except Exception as e2:
                 e = f"{num}: ConnectionError/{e1}, {e2}: {s_url=}"
-                logger.error(e)
+                log.error(e)
             return {"station_name": s_name, "error": e}, []
 
         try:
@@ -68,10 +67,10 @@ class BomETL:
         except Exception as e1:
             try:
                 e = f"{num}: JSON/data error/{e1}: {r.status_code=}, {s_id} {r.content[:500]=}"
-                logger.error(e)
+                log.error(e)
             except Exception as e2:
                 e = f"{num}: JSON/data error/{e1}, {e2}: {r.status_code=}, {r.content[:500]=}"
-                logger.error(e)
+                log.error(e)
             return {"station_name": s_name, "error": e}, []
 
         last_date_time: str = (
