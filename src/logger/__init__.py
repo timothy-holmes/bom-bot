@@ -1,4 +1,5 @@
 import json
+import logging
 import logging.config
 
 """
@@ -24,6 +25,7 @@ Usage:
 with open("./config/logging.json", "r") as config_json:
     logging.config.dictConfig(json.load(config_json))
 
+log = logging.getLogger('bom-bot')
 
 def build_logger(name: str):
     log = logging.getLogger(name)

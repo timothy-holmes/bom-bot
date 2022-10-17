@@ -1,22 +1,23 @@
 import json
-from src.bom_bot import BomScraper, build_logger
+
+from src.logger import log
+from src.bom_bot import BomETL
+
 
 
 def main():
-    logger = build_logger(".".join(["bom-bot", __name__]))
-    logger.debug("Created logger")
-
     with open("./config/config.json", "r") as c:
         config = json.load(c)
-    logger.debug("Loaded config file")
+    log.debug("Loaded config file")
 
     with open("./config/stations.json", "r") as s:
         stations = json.load(s)
-    logger.debug("Loaded stations file")
+    log.debug("Loaded stations file")
 
-    bom_scraper = BomScraper(config, stations)
-    bom_scraper.action_stations()
-    logger.debug("Actioned stations (fuck you)")
+    bom_etl = BomETL(config, stations)
+    bom_etl.action_stations()
+    log.debug("Extracted stations: {', '.join(s['station_name'] for s in stations}")
+
 
 
 if __name__ == "__main__":
