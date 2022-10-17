@@ -1,90 +1,122 @@
 import json
-from datetime import datetime
-from zoneinfo import ZoneInfo
+from typing import Any
+
 import requests
 
 from src.logger import build_logger
+from models import IotRecord, parse_bom_dt
 
 logger = build_logger(".".join(["bom-bot", __name__]))
 
-# not used yet
-class CustomException:
-    def __init__(self, exception_raised):
-        logger.error(f"{str(exception_raised)=}")
-        raise Exception
-
-
-class BomScraper:
-    def __init__(self, config: dict[str, str], stations: list[dict[str, str]]):
+class BomETL:
+    def __init__(self, config: dict[str, str | str], stations: list[dict[str, str]]):
         # {"station_name": "TestStation", "station_url": "http://test"}
         self.stations = stations
         self.config = config
         logger.info("Loaded `stations` and `config`")
         self.req = requests.Session()
-        self.req.headers.update(config.get("req_headers", None))
+        self.req.headers.update(config.get("req_headers"))
         logger.debug(
             "Set request headers: "
-            + ",".join(k for k, v in config.get("req_headers", {}).items())
+            + ",".join(k for k in config.get("req_headers",{}))
         )
         logger.info("BomScraper instance: ready")
 
-    def action_stations(self):  # I hate myself
-        results = {
-            "start_time": str(datetime.now(tz=ZoneInfo("Australia/Melbourne"))),
-            "stations": [],
-        }
 
+    def action_stations(self):  # I hate myself
         for num, station in enumerate(self.stations):
             s_id = station["station_id"]
             s_name = station["station_name"]
             s_url = station["station_url"]
 
-            try:
-                r = self.req.get(s_url)
-                assert r.status_code == 200
-                logger.debug(f"Requested {s_url}, got {r.status_code=}")
-            except Exception as e1:
-                try:
-                    logger.error(
-                        f"{num}: HTTPError/{e1}: {r.status_code=}, {r.content=}"
-                    )
-                except Exception as e2:
-                    logger.error(f"{num}: ConnectionError/{e1}, {e2}: {s_url=}")
-                continue
-
-            try:
-                s_json = r.json()
-                assert s_id == (
-                    json_id := s_json.get("observations", {})
-                    .get("header", [""])[0]
-                    .get("ID", {})
-                )
-            except Exception as e1:
-                try:
-                    logger.error(
-                        f"{num}: JSON/data error/{e1}: {r.status_code=}, {s_id}=={json_id} {r.content[:500]=}"
-                    )
-                except Exception as e2:
-                    logger.error(
-                        f"{num}: JSON/data error/{e1}, {e2}: {r.status_code=}, {r.content[:500]=}"
-                    )
-                continue
-
-            last_date_time = (
-                s_json.get("observations", {})
-                .get("data", [""])[0]
-                .get("local_date_time_full", {})
-            )
-
-            s_path = self.config.get("save_path").format(
-                station_name=s_name, last_date_time=last_date_time
-            )  # prone to change
-
-            with open(s_path, "w") as station_json_file:
-                json.dump(s_json, station_json_file, indent=4)
-
-            result = {"station_name": s_name, "last_date_time": last_date_time}
-            results["stations"].append(result)
+            # extract
+            result, data = self._extract(num, s_id, s_name, s_url)
             logger.info(f"{num}: Extracted station data: " + json.dumps(result))
 
-        # return results
+            # transform
+            records = self._transform(data)
+
+            # load
+            print(self._load(records))
+
+    def _extract(self, num: int, s_id: str, s_name: str, s_url: str) -> tuple[dict[str ,str], list[dict[str, Any]]]:
+        try:
+            r = self.req.get(s_url)
+            logger.debug(f"Requested {s_url}, got {r.status_code=}")
+            assert r.status_code == 200
+        except Exception as e1:
+            try:
+                e = f"{num}: HTTPError/{e1}: {r.status_code=}, {r.content=}"
+                logger.error(e)
+            except Exception as e2:
+                e = f"{num}: ConnectionError/{e1}, {e2}: {s_url=}"
+                logger.error(e)
+            return {"station_name": s_name, "error": e}, []
+
+        try:
+            s_json: dict = r.json()
+            assert s_id == "{}.{}".format(
+                    (s_json
+                        .get("observations", {})
+                        .get("data", [{}])[0]
+                        .get("history_product", {})),
+                    (s_json
+                        .get("observations", {})
+                        .get("data", [{}])[0]
+                        .get("wmo", {}))
+                )
+        except Exception as e1:
+            try:
+                e = f"{num}: JSON/data error/{e1}: {r.status_code=}, {s_id} {r.content[:500]=}"
+                logger.error(e)
+            except Exception as e2:
+                e = f"{num}: JSON/data error/{e1}, {e2}: {r.status_code=}, {r.content[:500]=}"
+                logger.error(e)
+            return {"station_name": s_name, "error": e}, []
+
+        last_date_time: str = (
+            s_json
+                .get("observations", {})
+                .get("data", [{}])[0]
+                .get("local_date_time_full", {})
+        )
+
+        s_path = self.config.get("save_path","").format(
+            station_name=s_name, last_date_time=last_date_time
+        )  # prone to change
+
+        with open(s_path, "w") as station_json_file:
+            json.dump(s_json, station_json_file, indent=4)
+
+        result: dict[str, str] = {"station_name": s_name, "last_date_time": last_date_time}
+        data: list[dict[str, Any]] = s_json.get("observations", {}).get("data",[{}])
+
+        return result, data
+    
+    def _transform(self, data: list[dict[str, Any]]) -> list[IotRecord]:
+        records = []
+        extend = records.extend
+        for d in data:
+            extend((
+                IotRecord(
+                    utc_dt = parse_bom_dt(d['aifstime_utc']),
+                    device_id = f"{d['history']}.{d['wmo']}",
+                    entry_type = "air_temp",
+                    entry_frequency = "30m",
+                    entry_value = d["air_temp"],
+                    entry_unit = 'celcius'
+                ),
+                IotRecord(
+                    utc_dt = parse_bom_dt(d['aifstime_utc']),
+                    device_id = f"{d['history']}.{d['wmo']}",
+                    entry_type = "apparent_t",
+                    entry_frequency = "30m",
+                    entry_value = d["apparent_t"],
+                    entry_unit='celcius'
+                )
+            ))
+        return records
+
+    def _load(self, records: list[IotRecord]) -> dict[str, str | int]:
+        return {'device_id': records[0].device_id, 'count': len(records)}
+

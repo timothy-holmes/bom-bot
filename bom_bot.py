@@ -1,5 +1,5 @@
 import json
-from src.bom_bot import BomScraper, build_logger
+from src.bom_bot import BomETL, build_logger
 
 
 def main():
@@ -14,9 +14,10 @@ def main():
         stations = json.load(s)
     logger.debug("Loaded stations file")
 
-    bom_scraper = BomScraper(config, stations)
-    bom_scraper.action_stations()
-    logger.debug("Actioned stations (fuck you)")
+    bom_extract = BomETL(config, stations)
+    extract = bom_extract.action_stations()
+    logger.debug("Extracted stations: {', '.join(s['station_name'] for s in stations}")
+
 
 
 if __name__ == "__main__":

@@ -1,16 +1,16 @@
 [
     {
-        "station_id": "IDV60801",
+        "station_id": "IDV60801.94865",
         "station_name": "Laverton",
         "station_url": "http://www.bom.gov.au/fwo/IDV60801/IDV60801.94865.json"
     },
     {
-        "station_id": "IDT60901",
+        "station_id": "IDT60901.94970",
         "station_name": "Hobart",
         "station_url": "http://www.bom.gov.au/fwo/IDT60901/IDT60901.94970.json"
     },
     {
-        "station_id": "IDT60901",
+        "station_id": "IDT60901.95979",
         "station_name": "MountWellington",
         "station_url": "http://www.bom.gov.au/fwo/IDT60901/IDT60901.95979.json"
     }
