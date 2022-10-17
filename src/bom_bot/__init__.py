@@ -102,7 +102,7 @@ class BomETL:
             extend((
                 IotRecord(
                     utc_dt = parse_bom_dt(d['aifstime_utc']),
-                    device_id = f"{d['history']}.{d['wmo']}",
+                    device_id = f"{d['history_product']}.{d['wmo']}",
                     entry_type = "air_temp",
                     entry_frequency = "30m",
                     entry_value = d["air_temp"],
@@ -110,7 +110,7 @@ class BomETL:
                 ),
                 IotRecord(
                     utc_dt = parse_bom_dt(d['aifstime_utc']),
-                    device_id = f"{d['history']}.{d['wmo']}",
+                    device_id = f"{d['history_product']}.{d['wmo']}",
                     entry_type = "apparent_t",
                     entry_frequency = "30m",
                     entry_value = d["apparent_t"],
