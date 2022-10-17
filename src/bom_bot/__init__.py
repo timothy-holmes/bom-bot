@@ -8,18 +8,21 @@ from models import IotRecord, parse_bom_dt
 
 
 class BomETL:
-    def __init__(self, config: dict[str, str | str], stations: list[dict[str, str]]):
+    def __init__(self, config: dict[str, str], stations: list[dict[str, str]]):
         # {"station_name": "TestStation", "station_url": "http://test"}
         self.stations = stations
         self.config = config
         log.info("Loaded `stations` and `config`")
+
+        bom_headers: dict[str, str | int] = config.get("req_headers")
         self.req = requests.Session()
-        self.req.headers.update(config.get("req_headers"))
+        self.req.headers.update(bom_headers)
         log.debug(
             "Set request headers: "
-            + ",".join(k for k in config.get("req_headers",{}))
+            + ",".join(bom_headers)
         )
-        log.info("BomScraper instance: ready")
+
+        log.info("BomETL instance: ready")
 
 
     def action_stations(self):  # I hate myself
