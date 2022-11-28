@@ -1,14 +1,5 @@
 version: "3.8"
-
 services:
-  ofelia:
-    container_name: bom-bot-ofelia
-    image: mcuadros/ofelia:latest
-    depends_on:
-      - bot
-    command: daemon --docker
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
   bot:
     build: .
     container_name: bom-bot-script
